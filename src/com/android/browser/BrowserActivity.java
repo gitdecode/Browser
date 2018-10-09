@@ -16,10 +16,12 @@
 
 package com.android.browser;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -63,7 +65,7 @@ public class BrowserActivity extends Activity {
             finish();
             return;
         }
-
+        checkPermission();
         // If this was a web search request, pass it on to the default web
         // search provider and finish this activity.
         if (IntentHandler.handleWebSearchIntent(this, null, getIntent())) {
@@ -74,6 +76,19 @@ public class BrowserActivity extends Activity {
 
         Intent intent = (icicle == null) ? getIntent() : null;
         mController.start(intent);
+    }
+    private void checkPermission(){
+		if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+			Log.w(LOGTAG,"have write external storage ==============");
+		}else{
+			requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},222);
+		}
+	}
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.v(LOGTAG, "onPermissionsResult counts: " + permissions.length + ":" + grantResults.length);
     }
 
     public static boolean isTablet(Context context) {
